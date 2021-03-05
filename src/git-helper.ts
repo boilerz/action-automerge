@@ -29,21 +29,24 @@ export async function hasStatusCheck(
   }
 }
 
-export async function enableAutoMerge(githubToken: string): Promise<void> {
+function buildMergeCommitMessage(): string {
   const { number, title } = github.context.payload.pull_request!;
+  return `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`;
+}
+
+export async function enableAutoMerge(githubToken: string): Promise<void> {
   const octokit = github.getOctokit(githubToken);
   await octokit.graphql(enablePullRequestAutoMergeMutation, {
     pullRequestId: github.context.payload.pull_request?.node_id,
-    commitHeadline: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
+    commitHeadline: buildMergeCommitMessage(),
   });
 }
 
 export async function merge(githubToken: string): Promise<void> {
-  const { number, title } = github.context.payload.pull_request!;
   const octokit = github.getOctokit(githubToken);
   await octokit.pulls.merge({
     ...github.context.repo,
-    commit_message: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
-    pull_number: number!,
+    commit_message: buildMergeCommitMessage(),
+    pull_number: github.context.payload.pull_request!.number,
   });
 }
