@@ -1,0 +1,11 @@
+name: 'Automerge'
+description: 'Auto merge labeled pull requests'
+author: '@boilerz'
+inputs:
+  labels:
+    required: false
+    description: 'Detected label to auto merge'
+    default: 'automerge'
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
