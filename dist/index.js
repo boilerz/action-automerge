@@ -6126,8 +6126,8 @@ const tslib_1 = __nccwpck_require__(351);
 const core = tslib_1.__importStar(__nccwpck_require__(186));
 const github = tslib_1.__importStar(__nccwpck_require__(438));
 const enablePullRequestAutoMergeMutation = `
-  mutation enablePullRequestAutoMerge($pullRequestId: ID!) {
-    enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId }) {
+  mutation enablePullRequestAutoMerge($pullRequestId: ID!, $commitHeadline: String!) {
+    enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId, commitHeadline: $commitHeadline }) {
       clientMutationId
     }
   }
@@ -6149,9 +6149,11 @@ exports.hasStatusCheck = hasStatusCheck;
 function enableAutoMerge(githubToken) {
     var _a;
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { number, title } = github.context.payload.pull_request;
         const octokit = github.getOctokit(githubToken);
         yield octokit.graphql(enablePullRequestAutoMergeMutation, {
             pullRequestId: (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.node_id,
+            commitHeadline: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
         });
     });
 }
