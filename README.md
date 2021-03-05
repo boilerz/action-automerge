@@ -3,7 +3,7 @@
 [![GH CI Action](https://github.com/boilerz/action-release/workflows/CI/badge.svg)](https://github.com/boilerz/action-release/actions?query=workflow:CI)
 [![codecov](https://codecov.io/gh/boilerz/action-release/branch/master/graph/badge.svg)](https://codecov.io/gh/boilerz/action-release)
 
-> Github action that merge or enable auto merge for PRs
+> Github action that merge or enable auto merging for PRs
 
 ### Usage
 
