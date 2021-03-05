@@ -27,7 +27,7 @@ jobs:
           node-version: '14.x'
 
       - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+        id: yarn-cache
         with:
           path: '**/node_modules'
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
@@ -35,33 +35,33 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Install packages
-        if: steps.yarn-cache.outputs.cache-hit != 'true' # Check cache
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn
 
       - uses: boilerz/action-automerge@master
         env:
           GITHUB_TOKEN: ${{ secrets.GH_BOILERZ_BOT_TOKEN }}
 
-#      - name: Typecheck
-#        run: yarn typecheck
+       - name: Typecheck
+         run: yarn typecheck
 
-#      - name: Lint
-#        run: yarn lint
+       - name: Lint
+         run: yarn lint
 
-#      - name: Build output
-#        run: yarn build
+       - name: Build output
+         run: yarn build
 
-#      - name: Run Tests
-#        run: yarn test
+       - name: Run Tests
+         run: yarn test
 
-#      - name: Send coverage
-#        run: yarn codecov
-#        env:
-#          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+       - name: Send coverage
+         run: yarn codecov
+         env:
+           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
-#      - uses: boilerz/action-release@master
-#        with:
-#          publish: 'false'
-#        env:
-#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#          GITHUB_TOKEN: ${{ secrets.GH_BOILERZ_BOT_TOKEN }}
+       - uses: boilerz/action-release@master
+         with:
+           publish: 'false'
+         env:
+           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+           GITHUB_TOKEN: ${{ secrets.GH_BOILERZ_BOT_TOKEN }}
