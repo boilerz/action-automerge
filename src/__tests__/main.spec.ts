@@ -153,10 +153,17 @@ describe('gh action', () => {
       [MockFunction] {
         "calls": Array [
           Array [
+            "🔀 Mergeable: true - state: clean",
+          ],
+          Array [
             "🔀 Merging branch",
           ],
         ],
         "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
           Object {
             "type": "return",
             "value": undefined,
@@ -179,10 +186,17 @@ describe('gh action', () => {
       [MockFunction] {
         "calls": Array [
           Array [
+            "🔀 Mergeable: false - state: clean",
+          ],
+          Array [
             "🔀 Enabling auto merge on the PR #42 (000001)",
           ],
         ],
         "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
           Object {
             "type": "return",
             "value": undefined,

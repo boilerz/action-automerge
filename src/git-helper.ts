@@ -1,3 +1,4 @@
+import * as core from '@actions/core';
 import * as github from '@actions/github';
 import type { components } from '@octokit/openapi-types';
 
@@ -15,12 +16,17 @@ export async function hasStatusCheck(
   githubToken: string,
   mainBranch: string = 'master',
 ): Promise<boolean> {
-  const octokit = github.getOctokit(githubToken);
-  const { data: branch } = await octokit.repos.getBranchProtection({
-    ...github.context.repo,
-    branch: mainBranch,
-  });
-  return !!branch.required_status_checks;
+  try {
+    const octokit = github.getOctokit(githubToken);
+    const { data: branch } = await octokit.repos.getBranchProtection({
+      ...github.context.repo,
+      branch: mainBranch,
+    });
+    return !!branch.required_status_checks;
+  } catch (err) {
+    core.error(`💥 [hasStatusCheck] ${err.message}`);
+    return false;
+  }
 }
 
 export async function enableAutoMerge(githubToken: string): Promise<void> {
@@ -31,9 +37,11 @@ export async function enableAutoMerge(githubToken: string): Promise<void> {
 }
 
 export async function merge(githubToken: string): Promise<void> {
+  const { number, title } = github.context.payload.pull_request!;
   const octokit = github.getOctokit(githubToken);
   await octokit.pulls.merge({
     ...github.context.repo,
-    pull_number: github.context.payload.pull_request?.number!,
+    commit_message: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
+    pull_number: number!,
   });
 }
