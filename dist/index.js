@@ -6146,23 +6146,25 @@ function hasStatusCheck(githubToken, mainBranch = 'master') {
     });
 }
 exports.hasStatusCheck = hasStatusCheck;
+function buildMergeCommitMessage() {
+    const { number, title } = github.context.payload.pull_request;
+    return `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`;
+}
 function enableAutoMerge(githubToken) {
     var _a;
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { number, title } = github.context.payload.pull_request;
         const octokit = github.getOctokit(githubToken);
         yield octokit.graphql(enablePullRequestAutoMergeMutation, {
             pullRequestId: (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.node_id,
-            commitHeadline: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
+            commitHeadline: buildMergeCommitMessage(),
         });
     });
 }
 exports.enableAutoMerge = enableAutoMerge;
 function merge(githubToken) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { number, title } = github.context.payload.pull_request;
         const octokit = github.getOctokit(githubToken);
-        yield octokit.pulls.merge(Object.assign(Object.assign({}, github.context.repo), { commit_message: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`, pull_number: number }));
+        yield octokit.pulls.merge(Object.assign(Object.assign({}, github.context.repo), { commit_message: buildMergeCommitMessage(), pull_number: github.context.payload.pull_request.number }));
     });
 }
 exports.merge = merge;
