@@ -64,13 +64,14 @@ describe('git-helper', () => {
         Array [
           Array [
             "
-          mutation enablePullRequestAutoMerge($pullRequestId: ID!) {
-            enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId }) {
+          mutation enablePullRequestAutoMerge($pullRequestId: ID!, $commitHeadline: String!) {
+            enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId, commitHeadline: $commitHeadline }) {
               clientMutationId
             }
           }
         ",
             Object {
+              "commitHeadline": ":twisted_rightwards_arrows: Merge pull request #42 - Super feature",
               "pullRequestId": "000001",
             },
           ],

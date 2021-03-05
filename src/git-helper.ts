@@ -5,8 +5,8 @@ import type { components } from '@octokit/openapi-types';
 export type PullRequest = components['schemas']['pull-request'];
 
 const enablePullRequestAutoMergeMutation = `
-  mutation enablePullRequestAutoMerge($pullRequestId: ID!) {
-    enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId }) {
+  mutation enablePullRequestAutoMerge($pullRequestId: ID!, $commitHeadline: String!) {
+    enablePullRequestAutoMerge(input: { pullRequestId: $pullRequestId, commitHeadline: $commitHeadline }) {
       clientMutationId
     }
   }
@@ -30,9 +30,11 @@ export async function hasStatusCheck(
 }
 
 export async function enableAutoMerge(githubToken: string): Promise<void> {
+  const { number, title } = github.context.payload.pull_request!;
   const octokit = github.getOctokit(githubToken);
   await octokit.graphql(enablePullRequestAutoMergeMutation, {
     pullRequestId: github.context.payload.pull_request?.node_id,
+    commitHeadline: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`,
   });
 }
 
