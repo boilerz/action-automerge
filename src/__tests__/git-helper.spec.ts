@@ -12,6 +12,7 @@ describe('git-helper', () => {
     github.context.payload = {
       pull_request: {
         node_id: '000001',
+        title: 'Super feature',
         number: 42,
       },
     };
@@ -86,6 +87,7 @@ describe('git-helper', () => {
         Array [
           Array [
             Object {
+              "commit_message": ":twisted_rightwards_arrows: Merge pull request #42 - Super feature",
               "owner": "octokit-fixture-org",
               "pull_number": 42,
               "repo": "branch-protection",

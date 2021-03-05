@@ -60,6 +60,9 @@ export default async function run(
       return;
     }
 
+    core.info(
+      `🔀 Mergeable: ${pullRequest.mergeable} - state: ${pullRequest.mergeable_state}`,
+    );
     if (pullRequest.mergeable && pullRequest.mergeable_state === 'clean') {
       core.info('🔀 Merging branch');
       await gitHelper.merge(options.githubToken);

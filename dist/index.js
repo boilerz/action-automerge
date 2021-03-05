@@ -6123,6 +6123,7 @@ function wrappy (fn, cb) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.merge = exports.enableAutoMerge = exports.hasStatusCheck = void 0;
 const tslib_1 = __nccwpck_require__(351);
+const core = tslib_1.__importStar(__nccwpck_require__(186));
 const github = tslib_1.__importStar(__nccwpck_require__(438));
 const enablePullRequestAutoMergeMutation = `
   mutation enablePullRequestAutoMerge($pullRequestId: ID!) {
@@ -6133,9 +6134,15 @@ const enablePullRequestAutoMergeMutation = `
 `;
 function hasStatusCheck(githubToken, mainBranch = 'master') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const octokit = github.getOctokit(githubToken);
-        const { data: branch } = yield octokit.repos.getBranchProtection(Object.assign(Object.assign({}, github.context.repo), { branch: mainBranch }));
-        return !!branch.required_status_checks;
+        try {
+            const octokit = github.getOctokit(githubToken);
+            const { data: branch } = yield octokit.repos.getBranchProtection(Object.assign(Object.assign({}, github.context.repo), { branch: mainBranch }));
+            return !!branch.required_status_checks;
+        }
+        catch (err) {
+            core.error(`💥 [hasStatusCheck] ${err.message}`);
+            return false;
+        }
     });
 }
 exports.hasStatusCheck = hasStatusCheck;
@@ -6150,10 +6157,10 @@ function enableAutoMerge(githubToken) {
 }
 exports.enableAutoMerge = enableAutoMerge;
 function merge(githubToken) {
-    var _a;
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { number, title } = github.context.payload.pull_request;
         const octokit = github.getOctokit(githubToken);
-        yield octokit.pulls.merge(Object.assign(Object.assign({}, github.context.repo), { pull_number: (_a = github.context.payload.pull_request) === null || _a === void 0 ? void 0 : _a.number }));
+        yield octokit.pulls.merge(Object.assign(Object.assign({}, github.context.repo), { commit_message: `:twisted_rightwards_arrows: Merge pull request #${number} - ${title}`, pull_number: number }));
     });
 }
 exports.merge = merge;
@@ -6207,6 +6214,7 @@ function run(options = exports.defaultRunOptions) {
                 core.info('❌ No status check found on the main branch, passing');
                 return;
             }
+            core.info(`🔀 Mergeable: ${pullRequest.mergeable} - state: ${pullRequest.mergeable_state}`);
             if (pullRequest.mergeable && pullRequest.mergeable_state === 'clean') {
                 core.info('🔀 Merging branch');
                 yield gitHelper.merge(options.githubToken);
