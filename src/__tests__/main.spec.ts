@@ -12,15 +12,19 @@ describe('gh action', () => {
   beforeEach(() => {
     (core.getInput as jest.Mock).mockReturnValue('automerge');
     github.context.eventName = 'pull_request';
+    const pullRequest = {
+      number: 42,
+      node_id: '000001',
+      auto_merge: false,
+      labels: [{ name: 'automerge' }],
+      mergeable: true,
+      mergeable_state: 'clean',
+    };
+    (gitHelper.getContextualPullRequest as jest.Mock).mockReturnValue(
+      pullRequest,
+    );
     github.context.payload = {
-      pull_request: {
-        number: 42,
-        node_id: '000001',
-        auto_merge: false,
-        labels: [{ name: 'automerge' }],
-        mergeable: true,
-        mergeable_state: 'clean',
-      },
+      pull_request: pullRequest,
     };
   });
   it('should fail without github token', async () => {
