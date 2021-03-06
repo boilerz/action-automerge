@@ -6121,7 +6121,7 @@ function wrappy (fn, cb) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.merge = exports.enableAutoMerge = exports.hasStatusCheck = void 0;
+exports.getContextualPullRequest = exports.merge = exports.enableAutoMerge = exports.hasStatusCheck = void 0;
 const tslib_1 = __nccwpck_require__(351);
 const core = tslib_1.__importStar(__nccwpck_require__(186));
 const github = tslib_1.__importStar(__nccwpck_require__(438));
@@ -6168,6 +6168,14 @@ function merge(githubToken) {
     });
 }
 exports.merge = merge;
+function getContextualPullRequest(githubToken) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const octokit = github.getOctokit(githubToken);
+        const { data: pullRequest } = yield octokit.pulls.get(Object.assign(Object.assign({}, github.context.repo), { pull_number: github.context.payload.pull_request.number }));
+        return pullRequest;
+    });
+}
+exports.getContextualPullRequest = getContextualPullRequest;
 
 
 /***/ }),
@@ -6203,7 +6211,7 @@ function run(options = exports.defaultRunOptions) {
                 core.info(`⚠️ Not a PR event, passing: ${github.context.eventName}`);
                 return;
             }
-            const pullRequest = github.context.payload.pull_request;
+            const pullRequest = yield gitHelper.getContextualPullRequest(options.githubToken);
             const pullRequestLabels = pullRequest.labels.map(({ name }) => name);
             if (pullRequest.auto_merge) {
                 core.info('⏩ Auto merge already enabled');

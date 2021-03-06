@@ -50,3 +50,14 @@ export async function merge(githubToken: string): Promise<void> {
     pull_number: github.context.payload.pull_request!.number,
   });
 }
+
+export async function getContextualPullRequest(
+  githubToken: string,
+): Promise<PullRequest> {
+  const octokit = github.getOctokit(githubToken);
+  const { data: pullRequest } = await octokit.pulls.get({
+    ...github.context.repo,
+    pull_number: github.context.payload.pull_request!.number,
+  });
+  return pullRequest;
+}

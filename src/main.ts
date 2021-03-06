@@ -4,7 +4,6 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 
 import * as gitHelper from './git-helper';
-import { PullRequest } from './git-helper';
 
 interface RunOptions {
   labels?: string;
@@ -37,7 +36,9 @@ export default async function run(
       return;
     }
 
-    const pullRequest = github.context.payload.pull_request as PullRequest;
+    const pullRequest = await gitHelper.getContextualPullRequest(
+      options.githubToken,
+    );
     const pullRequestLabels = pullRequest.labels.map(({ name }) => name!);
 
     if (pullRequest.auto_merge) {
