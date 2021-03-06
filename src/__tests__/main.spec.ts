@@ -11,6 +11,7 @@ jest.mock('../git-helper');
 describe('gh action', () => {
   beforeEach(() => {
     (core.getInput as jest.Mock).mockReturnValue('automerge');
+    (gitHelper.hasStatusCheck as jest.Mock).mockResolvedValue(true);
     github.context.eventName = 'pull_request';
     const pullRequest = {
       number: 42,
@@ -75,6 +76,7 @@ describe('gh action', () => {
   });
 
   it('should skip when auto merge is already enabled on that pull request', async () => {
+    github.context.payload.pull_request!.mergeable = false;
     github.context.payload.pull_request!.auto_merge = true;
     await run({
       ...defaultRunOptions,
@@ -85,10 +87,17 @@ describe('gh action', () => {
       [MockFunction] {
         "calls": Array [
           Array [
+            "🔀 Mergeable: false - state: clean",
+          ],
+          Array [
             "⏩ Auto merge already enabled",
           ],
         ],
         "results": Array [
+          Object {
+            "type": "return",
+            "value": undefined,
+          },
           Object {
             "type": "return",
             "value": undefined,
