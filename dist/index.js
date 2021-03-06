@@ -6213,10 +6213,6 @@ function run(options = exports.defaultRunOptions) {
             }
             const pullRequest = yield gitHelper.getContextualPullRequest(options.githubToken);
             const pullRequestLabels = pullRequest.labels.map(({ name }) => name);
-            if (pullRequest.auto_merge) {
-                core.info('⏩ Auto merge already enabled');
-                return;
-            }
             if (requiredLabels.length &&
                 !pullRequestLabels.some((label) => requiredLabels.includes(label))) {
                 core.info(`🚫 Missing required labels => required: [${requiredLabels}], found: [${pullRequestLabels}]`);
@@ -6230,11 +6226,14 @@ function run(options = exports.defaultRunOptions) {
             if (pullRequest.mergeable && pullRequest.mergeable_state === 'clean') {
                 core.info('🔀 Merging branch');
                 yield gitHelper.merge(options.githubToken);
+                return;
             }
-            else {
-                core.info(`🔀 Enabling auto merge on the PR #${pullRequest.number} (${pullRequest.node_id})`);
-                yield gitHelper.enableAutoMerge(options.githubToken);
+            if (pullRequest.auto_merge) {
+                core.info('⏩ Auto merge already enabled');
+                return;
             }
+            core.info(`🔀 Enabling auto merge on the PR #${pullRequest.number} (${pullRequest.node_id})`);
+            yield gitHelper.enableAutoMerge(options.githubToken);
         }
         catch (error) {
             core.setFailed(error.message);

@@ -41,11 +41,6 @@ export default async function run(
     );
     const pullRequestLabels = pullRequest.labels.map(({ name }) => name!);
 
-    if (pullRequest.auto_merge) {
-      core.info('⏩ Auto merge already enabled');
-      return;
-    }
-
     if (
       requiredLabels.length &&
       !pullRequestLabels.some((label) => requiredLabels.includes(label))
@@ -67,12 +62,18 @@ export default async function run(
     if (pullRequest.mergeable && pullRequest.mergeable_state === 'clean') {
       core.info('🔀 Merging branch');
       await gitHelper.merge(options.githubToken);
-    } else {
-      core.info(
-        `🔀 Enabling auto merge on the PR #${pullRequest.number} (${pullRequest.node_id})`,
-      );
-      await gitHelper.enableAutoMerge(options.githubToken);
+      return;
     }
+
+    if (pullRequest.auto_merge) {
+      core.info('⏩ Auto merge already enabled');
+      return;
+    }
+
+    core.info(
+      `🔀 Enabling auto merge on the PR #${pullRequest.number} (${pullRequest.node_id})`,
+    );
+    await gitHelper.enableAutoMerge(options.githubToken);
   } catch (error) {
     core.setFailed(error.message);
   }
